@@ -12,8 +12,6 @@ non-transitivity comes from:
    cannot be explained by category decomposition.
 """
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any
 
 import numpy as np

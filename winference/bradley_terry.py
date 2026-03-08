@@ -5,16 +5,12 @@ The BT model assumes P(i beats j) = sigma(theta_i - theta_j) where sigma
 is the logistic function. Fitting recovers the strength vector theta.
 """
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from typing import Self
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.optimize import minimize
 from scipy.special import expit
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
 
 
 class BradleyTerry:
@@ -42,7 +38,7 @@ class BradleyTerry:
         self,
         comparisons: list[tuple[str, str, bool]],
         reg: float = 1e-4,
-    ) -> BradleyTerry:
+    ) -> Self:
         """Fit the model from a list of (model_a, model_b, a_wins) triples.
 
         Args:

@@ -13,18 +13,14 @@ The formal test is a likelihood-ratio test:
     Lambda = -2(l0 - l1)  ~  chi2  with (K-1)(N-1) degrees of freedom.
 """
 
-from __future__ import annotations
-
 from collections import Counter
-from typing import TYPE_CHECKING
+from typing import Self
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy import stats
 
 from winference.bradley_terry import BradleyTerry
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
 
 
 class GroupTest:
@@ -57,7 +53,7 @@ class GroupTest:
         comparisons: list[tuple[str, str, bool]],
         group_labels: list[str],
         reg: float = 1e-4,
-    ) -> GroupTest:
+    ) -> Self:
         """Fit null (pooled) and alternative (per-group) BT models.
 
         Args:

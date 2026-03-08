@@ -7,15 +7,9 @@ indicate clusters of models that cannot be linearly ordered — i.e. pockets
 of non-transitivity.
 """
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import numpy as np
-
-if TYPE_CHECKING:
-    import pandas as pd
-    from numpy.typing import NDArray
+import pandas as pd
+from numpy.typing import NDArray
 
 
 class TournamentGraph:

@@ -5,15 +5,11 @@ When your model says "A beats B with probability 0.65", does A actually
 win 65% of the time?  These tools check.
 """
 
-from __future__ import annotations
-
 from itertools import pairwise
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import numpy as np
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
+from numpy.typing import NDArray
 
 
 def expected_calibration_error(

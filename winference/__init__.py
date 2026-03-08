@@ -8,7 +8,7 @@ Two approaches to calibrating win rates when preferences aren't transitive:
      within each group, calibrate per group, compose for any target distribution.
 """
 
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import version
 
 from winference.bradley_terry import BradleyTerry
 from winference.calibration import (
@@ -26,10 +26,7 @@ from winference.simulate import (
 )
 from winference.tournament import TournamentGraph
 
-try:
-    __version__ = version("winference")
-except PackageNotFoundError:
-    __version__ = "0.1.0"
+__version__ = version("winference")
 
 __all__ = [
     "BradleyTerry",

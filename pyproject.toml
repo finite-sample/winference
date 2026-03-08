@@ -95,7 +95,6 @@ known-first-party = ["winference"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --tb=short"
-pythonpath = ["."]
 
 [tool.coverage.run]
 source = ["winference"]

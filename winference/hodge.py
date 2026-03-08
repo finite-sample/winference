@@ -28,15 +28,11 @@ Calibration strategy
    non-transitive structure, the part your calibration *ignores*.
 """
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, NamedTuple
+from typing import NamedTuple
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.special import expit, logit
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
 
 
 class HodgeResult(NamedTuple):

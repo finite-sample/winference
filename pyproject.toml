@@ -1,0 +1,123 @@
+[build-system]
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[project]
+name = "winference"
+version = "0.1.0"
+description = "Win rate calibration under non-transitivity via Hodge decomposition and heterogeneous group testing"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+authors = [
+    { name = "gaurav sood" },
+]
+keywords = [
+    "bradley-terry",
+    "calibration",
+    "hodge-decomposition",
+    "llm-evaluation",
+    "non-transitivity",
+    "pairwise-comparison",
+    "win-rate",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+dependencies = [
+    "matplotlib>=3.5",
+    "numpy>=1.22",
+    "pandas>=1.5",
+    "scikit-learn>=1.1",
+    "scipy>=1.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "deptry>=0.22",
+    "pydoclint>=0.6",
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.8",
+]
+docs = [
+    "furo>=2024.0",
+    "sphinx>=7.0",
+    "sphinx-autodoc-typehints>=2.0",
+    "sphinx-copybutton>=0.5",
+]
+
+[project.urls]
+Documentation = "https://github.com/finite-sample/winference#readme"
+Homepage = "https://github.com/finite-sample/winference"
+Issues = "https://github.com/finite-sample/winference/issues"
+Repository = "https://github.com/finite-sample/winference"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "ARG",
+    "B",
+    "C4",
+    "E",
+    "F",
+    "I",
+    "PTH",
+    "RUF",
+    "SIM",
+    "TCH",
+    "UP",
+    "W",
+]
+ignore = [
+    "ARG001",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["winference"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["winference"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+
+[tool.pydoclint]
+style = "google"
+arg-type-hints-in-docstring = false
+check-return-types = false
+check-arg-order = true
+allow-init-docstring = true
+
+[tool.deptry]
+extend_exclude = ["examples", "docs"]
+pep621_dev_dependency_groups = ["dev", "docs"]
+ignore = ["DEP002"]
+[tool.deptry.per_rule_ignores]
+DEP002 = ["matplotlib", "pandas", "scikit-learn"]

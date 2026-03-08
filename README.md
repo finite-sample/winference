@@ -1,10 +1,10 @@
 ## winference: Win rate calibration under non-transitivity.
 
-[![Python application](https://github.com/finite-sample/winrate/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/winrate/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/winrate.svg)](https://pypi.org/project/winrate/)
-[![Downloads](https://pepy.tech/badge/winrate)](https://pepy.tech/project/winrate)
-[![Documentation](https://github.com/finite-sample/winrate/actions/workflows/docs.yml/badge.svg)](https://finite-sample.github.io/winrate/)
-[![License](https://img.shields.io/github/license/finite-sample/winrate)](https://github.com/finite-sample/winrate/blob/main/LICENSE)
+[![Python application](https://github.com/finite-sample/winference/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/winference/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/winference.svg)](https://pypi.org/project/winference/)
+[![Downloads](https://pepy.tech/badge/winference)](https://pepy.tech/project/winference)
+[![Documentation](https://github.com/finite-sample/winference/actions/workflows/docs.yml/badge.svg)](https://finite-sample.github.io/winference/)
+[![License](https://img.shields.io/github/license/finite-sample/winference)](https://github.com/finite-sample/winference/blob/main/LICENSE)
 
 
 When you run an LLM arena and report "Model A beats Model B 62% of the time,"

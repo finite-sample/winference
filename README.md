@@ -1,6 +1,11 @@
-# winference
+## winference: Win rate calibration under non-transitivity.
 
-**Win rate calibration under non-transitivity.**
+[![Python application](https://github.com/finite-sample/winrate/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/winrate/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/winrate.svg)](https://pypi.org/project/winrate/)
+[![Downloads](https://pepy.tech/badge/winrate)](https://pepy.tech/project/winrate)
+[![Documentation](https://github.com/finite-sample/winrate/actions/workflows/docs.yml/badge.svg)](https://finite-sample.github.io/winrate/)
+[![License](https://img.shields.io/github/license/finite-sample/winrate)](https://github.com/finite-sample/winrate/blob/main/LICENSE)
+
 
 When you run an LLM arena and report "Model A beats Model B 62% of the time,"
 is that number *calibrated*?  And does it still hold when your users ask

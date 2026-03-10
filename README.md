@@ -1,4 +1,4 @@
-## winference: Win rate calibration under non-transitivity.
+## winference: Win rate calibration under non-transitivity
 
 [![Python application](https://github.com/finite-sample/winference/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/winference/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/winference.svg)](https://pypi.org/project/winference/)

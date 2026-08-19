@@ -26,10 +26,13 @@ class GroupTest:
     """Likelihood-ratio test for heterogeneity across prompt groups.
 
     Examples:
-        >>> gt = GroupTest(models=["A","B","C"], groups=["math","creative"])
-        >>> gt.fit(comparisons, group_labels)
-        >>> print(gt.test_result())
-        {'statistic': 14.2, 'df': 2, 'p_value': 0.0008}
+        >>> from winference import GroupTest
+        >>> comparisons = [("A", "B", True)] * 20 + [("A", "B", False)] * 20
+        >>> group_labels = ["math"] * 20 + ["creative"] * 20
+        >>> gt = GroupTest(models=["A", "B"], groups=["math", "creative"])
+        >>> _ = gt.fit(comparisons, group_labels)
+        >>> gt.test_result()["reject_at_05"]  # A wins math, B wins creative
+        True
     """
 
     def __init__(self, models: list[str], groups: list[str]) -> None:

@@ -16,10 +16,11 @@ class BradleyTerry:
     """Maximum-likelihood Bradley-Terry model.
 
     Examples:
-        >>> bt = BradleyTerry(["A", "B", "C"])
-        >>> bt.fit(comparisons)  # list of (i, j, outcome) tuples
-        >>> bt.win_probability("A", "B")
-        0.73
+        >>> from winference import BradleyTerry
+        >>> comparisons = [("A", "B", True)] * 7 + [("A", "B", False)] * 3
+        >>> bt = BradleyTerry(["A", "B"]).fit(comparisons)
+        >>> round(bt.win_probability("A", "B"), 2)
+        0.7
     """
 
     def __init__(self, models: list[str]) -> None:

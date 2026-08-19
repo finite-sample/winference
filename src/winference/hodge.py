@@ -50,11 +50,15 @@ class HodgeDecomposition:
     """Hodge decomposition of a pairwise comparison matrix.
 
     Examples:
-        >>> hd = HodgeDecomposition(["A", "B", "C", "D"])
-        >>> result = hd.fit(win_rate_matrix)
-        >>> print(f"Cyclic fraction: {result.cyclic_variance:.1%}")
-        >>> # Calibrate using only the transitive part
-        >>> p_trans = hd.transitive_win_probability("A", "B")
+        >>> import numpy as np
+        >>> from winference import HodgeDecomposition
+        >>> rps = np.array([[0.5, 0.9, 0.1], [0.1, 0.5, 0.9], [0.9, 0.1, 0.5]])
+        >>> hd = HodgeDecomposition(["A", "B", "C"])
+        >>> result = hd.fit(rps)
+        >>> result.cyclic_variance  # rock-paper-scissors is pure curl
+        1.0
+        >>> hd.transitive_win_probability("A", "B")  # no transitive signal left
+        0.5
     """
 
     def __init__(self, models: list[str]) -> None:

@@ -15,6 +15,7 @@ class TournamentGraph:
     """Directed tournament graph built from pairwise comparison data.
 
     Examples:
+        >>> from winference import TournamentGraph
         >>> tg = TournamentGraph(["A", "B", "C"])
         >>> tg.add_result("A", "B", win=True)
         >>> tg.add_result("B", "C", win=True)

@@ -1,9 +1,9 @@
 [build-system]
-requires = ["uv_build>=0.10.9,<0.11.0"]
+requires = ["uv_build>=0.12.5,<0.13"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-root = ""
+module-name = "winference"
 
 [project]
 name = "winference"
@@ -11,6 +11,7 @@ version = "0.1.0"
 description = "Win rate calibration under non-transitivity via Hodge decomposition and heterogeneous group testing"
 readme = "README.md"
 license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 authors = [
     { name = "gaurav sood" },
@@ -28,11 +29,11 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Typing :: Typed",
@@ -45,21 +46,6 @@ dependencies = [
     "scipy>=1.9",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "deptry>=0.22",
-    "pydoclint>=0.6",
-    "pytest>=8.0",
-    "pytest-cov>=4.0",
-    "ruff>=0.8",
-]
-docs = [
-    "furo>=2024.0",
-    "sphinx>=7.0",
-    "sphinx-autodoc-typehints>=2.0",
-    "sphinx-copybutton>=0.5",
-]
-
 [project.urls]
 Documentation = "https://github.com/finite-sample/winference#readme"
 Homepage = "https://github.com/finite-sample/winference"
@@ -67,27 +53,34 @@ Issues = "https://github.com/finite-sample/winference/issues"
 Repository = "https://github.com/finite-sample/winference"
 
 [tool.ruff]
+line-length = 88
 target-version = "py312"
-line-length = 100
 
 [tool.ruff.lint]
+external = ["DOC"]
 select = [
-    "ARG",
-    "B",
-    "C4",
-    "E",
-    "F",
-    "I",
-    "PTH",
-    "RUF",
-    "SIM",
-    "TCH",
-    "UP",
-    "W",
+    "E", "W", "F", "I", "B", "C4", "UP", "N", "D", "S", "SIM", "T20", "PT", "RUF",
+    "PTH", "RET", "PIE", "FURB", "PERF", "DTZ", "LOG", "G", "TC", "FLY",
+    "RSE", "SLOT", "FA", "A", "EXE", "ICN", "PGH", "PLE", "ARG", "SLF",
 ]
-ignore = [
-    "ARG001",
-]
+# D203/D213: the google convention the fleet standard picks. W191/D206/D300:
+# ruff's own docs list these as always incompatible with `ruff format`, which
+# the standard also runs.
+ignore = ["D203", "D213", "W191", "D206", "D300"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# N803/N806: matrices are capitalised throughout, as in the linear algebra the
+# code implements -- W the win-rate matrix, Y the pairwise flow, L the graph
+# Laplacian, C the curl. Renaming them to `w`, `y`, `l` would make the code
+# harder to check against the papers it follows, not easier.
+"src/**" = ["N803", "N806"]
+"tests/**" = ["S101", "D", "ARG", "SLF", "N803", "N806"]
+# T20: the examples are demonstration scripts whose output *is* printing.
+"examples/**" = ["T20", "N803", "N806"]
+"docs/**" = ["D"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["winference"]
@@ -97,7 +90,7 @@ testpaths = ["tests"]
 addopts = "-v --tb=short"
 
 [tool.coverage.run]
-source = ["winference"]
+source = ["src"]
 branch = true
 
 [tool.coverage.report]
@@ -111,12 +104,30 @@ exclude_lines = [
 style = "google"
 arg-type-hints-in-docstring = false
 check-return-types = false
-check-arg-order = true
+check-class-attributes = false
 allow-init-docstring = true
+exclude = '\.venv|tests|docs'
+check-arg-order = true
 
-[tool.deptry]
-extend_exclude = ["examples", "docs"]
-pep621_dev_dependency_groups = ["dev", "docs"]
-ignore = ["DEP002"]
-[tool.deptry.per_rule_ignores]
-DEP002 = ["matplotlib", "pandas", "scikit-learn"]
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "standard"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14",
+    "pyright>=1.1.390",
+    "pydoclint>=0.5",
+    "pre-commit>=4",
+    { include-group = "test" },
+]
+test = ["pytest>=8", "pytest-cov>=6"]
+docs = [
+    "sphinx>=8",
+    "py-canon @ git+https://github.com/gojiplus/py-canon@v1",
+    "furo",
+    "myst-parser",
+    "sphinx-copybutton",
+]
+
+[tool.preen]

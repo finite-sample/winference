@@ -1,5 +1,4 @@
-"""
-Simulate pairwise comparison data with controlled non-transitivity.
+"""Simulate pairwise comparison data with controlled non-transitivity.
 
 Three generators corresponding to different stories about where
 non-transitivity comes from:
@@ -110,7 +109,9 @@ def simulate_heterogeneous(
         theta[cat] = {m: float(t[i]) for i, m in enumerate(models)}
 
     raw_weights: NDArray[np.float64] = rng.dirichlet(np.ones(n_categories) * 2)
-    category_weights = {cat: float(w) for cat, w in zip(category_names, raw_weights, strict=True)}
+    category_weights = {
+        cat: float(w) for cat, w in zip(category_names, raw_weights, strict=True)
+    }
 
     comparisons: list[tuple[str, str, bool]] = []
     categories: list[str] = []
@@ -211,7 +212,14 @@ def simulate_llm_arena(
         Same format as simulate_heterogeneous.
     """
     rng = np.random.default_rng(seed)
-    models = ["AlphaLM", "BetaChat", "GammaCoder", "DeltaWrite", "EpsilonAll", "ZetaMath"]
+    models = [
+        "AlphaLM",
+        "BetaChat",
+        "GammaCoder",
+        "DeltaWrite",
+        "EpsilonAll",
+        "ZetaMath",
+    ]
     categories = ["reasoning", "creative_writing", "coding"]
 
     theta: dict[str, dict[str, float]] = {

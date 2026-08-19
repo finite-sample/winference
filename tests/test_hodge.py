@@ -64,7 +64,11 @@ class TestVarianceFractions:
             ]
         )
         result = hd.fit(W)
-        total = result.transitive_variance + result.cyclic_variance + result.harmonic_variance
+        total = (
+            result.transitive_variance
+            + result.cyclic_variance
+            + result.harmonic_variance
+        )
         assert total == pytest.approx(1.0, abs=0.01)
 
     def test_transitive_data_high_transitive_variance(self) -> None:
@@ -116,7 +120,8 @@ class TestTransitiveWinMatrix:
         W = np.array([[0.5, 0.7, 0.8], [0.3, 0.5, 0.6], [0.2, 0.4, 0.5]])
         hd.fit(W)
         M = hd.transitive_win_matrix()
-        assert np.all(M >= 0) and np.all(M <= 1)
+        assert np.all(M >= 0)
+        assert np.all(M <= 1)
 
 
 class TestTransitiveStrengths:

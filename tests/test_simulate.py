@@ -79,7 +79,7 @@ class TestSimulateHeterogeneous:
         assert set(data["true_strengths"].keys()) == set(names)
 
     def test_raises_on_wrong_category_names_length(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="length n_categories"):
             simulate_heterogeneous(n_categories=3, category_names=["a", "b"])
 
     def test_reproducibility(self) -> None:
@@ -140,7 +140,14 @@ class TestSimulateLlmArena:
 
     def test_model_names(self) -> None:
         data = simulate_llm_arena()
-        expected = ["AlphaLM", "BetaChat", "GammaCoder", "DeltaWrite", "EpsilonAll", "ZetaMath"]
+        expected = [
+            "AlphaLM",
+            "BetaChat",
+            "GammaCoder",
+            "DeltaWrite",
+            "EpsilonAll",
+            "ZetaMath",
+        ]
         assert set(data["models"]) == set(expected)
 
     def test_category_names(self) -> None:

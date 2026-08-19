@@ -1,5 +1,4 @@
-"""
-winference: Win rate calibration under non-transitivity.
+"""winference: Win rate calibration under non-transitivity.
 
 Two approaches to calibrating win rates when preferences aren't transitive:
   A) Hodge decomposition — separate transitive signal from cyclic residual,

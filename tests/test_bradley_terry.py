@@ -96,7 +96,8 @@ class TestStrengths:
         bt.fit([("A", "B", True)] * 10)
         s = bt.strengths()
         assert isinstance(s, dict)
-        assert "A" in s and "B" in s
+        assert "A" in s
+        assert "B" in s
 
 
 class TestRank:

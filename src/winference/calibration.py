@@ -1,5 +1,4 @@
-"""
-Calibration metrics for pairwise win rate predictions.
+"""Calibration metrics for pairwise win rate predictions.
 
 When your model says "A beats B with probability 0.65", does A actually
 win 65% of the time?  These tools check.
@@ -25,7 +24,7 @@ def expected_calibration_error(
         n_bins: Number of bins for grouping predictions.
 
     Returns:
-        Weighted average |predicted - observed| across bins.
+        Weighted average ``|predicted - observed|`` across bins.
     """
     predicted = np.asarray(predicted, dtype=float)
     observed = np.asarray(observed, dtype=float)
@@ -62,7 +61,9 @@ def log_loss(
     """Binary cross-entropy loss.  Lower is better."""
     predicted = np.clip(np.asarray(predicted, dtype=float), 1e-10, 1 - 1e-10)
     observed = np.asarray(observed, dtype=float)
-    return float(-np.mean(observed * np.log(predicted) + (1 - observed) * np.log(1 - predicted)))
+    return float(
+        -np.mean(observed * np.log(predicted) + (1 - observed) * np.log(1 - predicted))
+    )
 
 
 def reliability_diagram(
@@ -113,7 +114,9 @@ def reliability_diagram(
     return result
 
 
-def _plot_reliability(ax: Any, result: dict[str, Any], label: str, color: str | None) -> None:
+def _plot_reliability(
+    ax: Any, result: dict[str, Any], label: str, color: str | None
+) -> None:
     mid = result["bin_midpoints"]
     acc = result["bin_accuracy"]
     mask = ~np.isnan(acc)

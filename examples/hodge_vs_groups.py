@@ -1,6 +1,4 @@
-"""
-hodge_vs_groups: When does each approach win?
-=============================================
+"""Hodge versus per-group Bradley-Terry: when does each approach win?
 
 Demonstrates the two approaches on data generated from two different
 mechanisms:
@@ -47,7 +45,8 @@ def evaluate(comparisons, categories, models, label):
     hd = HodgeDecomposition(models)
     hodge = hd.fit(W, weights=tg.counts)
     print(
-        f"  Hodge: transitive={hodge.transitive_variance:.1%}, cyclic={hodge.cyclic_variance:.1%}"
+        f"  Hodge: transitive={hodge.transitive_variance:.1%},"
+        f" cyclic={hodge.cyclic_variance:.1%}"
     )
 
     # Group test (if categories are informative)
@@ -81,7 +80,9 @@ def evaluate(comparisons, categories, models, label):
         tg_tr.add_result(a, b, w)
     hd_tr = HodgeDecomposition(models)
     hd_tr.fit(tg_tr.win_rate_matrix(), weights=tg_tr.counts)
-    pred_hodge = np.array([hd_tr.transitive_win_probability(a, b) for a, b, _ in test_comps])
+    pred_hodge = np.array(
+        [hd_tr.transitive_win_probability(a, b) for a, b, _ in test_comps]
+    )
 
     # Method 3: Per-group BT (only if categories exist)
     if len(groups) > 1:
@@ -107,6 +108,7 @@ def evaluate(comparisons, categories, models, label):
 
 
 def main():
+    """Run both scenarios and print the head-to-head comparison."""
     print("=" * 60)
     print("  winference: Hodge vs Per-Group BT -- when does each win?")
     print("=" * 60)

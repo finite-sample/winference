@@ -5,7 +5,12 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from winference import brier_score, expected_calibration_error, log_loss, reliability_diagram
+from winference import (
+    brier_score,
+    expected_calibration_error,
+    log_loss,
+    reliability_diagram,
+)
 from winference.calibration import compare_calibration
 
 

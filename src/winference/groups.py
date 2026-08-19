@@ -1,5 +1,4 @@
-"""
-Heterogeneous group testing and per-group calibration.
+"""Heterogeneous group testing and per-group calibration.
 
 Tests whether model strengths are constant across prompt categories
 (homogeneous BT) or differ by category (heterogeneous BT).  If
@@ -26,18 +25,23 @@ from winference.bradley_terry import BradleyTerry
 class GroupTest:
     """Likelihood-ratio test for heterogeneity across prompt groups.
 
-    Args:
-        models: Model identifiers.
-        groups: Unique group/category labels.
-
     Examples:
-        >>> gt = GroupTest(models=["A","B","C"], groups=["math","creative"])
-        >>> gt.fit(comparisons, group_labels)
-        >>> print(gt.test_result())
-        {'statistic': 14.2, 'df': 2, 'p_value': 0.0008}
+        >>> from winference import GroupTest
+        >>> comparisons = [("A", "B", True)] * 20 + [("A", "B", False)] * 20
+        >>> group_labels = ["math"] * 20 + ["creative"] * 20
+        >>> gt = GroupTest(models=["A", "B"], groups=["math", "creative"])
+        >>> _ = gt.fit(comparisons, group_labels)
+        >>> gt.test_result()["reject_at_05"]  # A wins math, B wins creative
+        True
     """
 
     def __init__(self, models: list[str], groups: list[str]) -> None:
+        """Create an unfitted test over ``models`` and ``groups``.
+
+        Args:
+            models: Model names, in the order used for indexing.
+            groups: Group/category labels a comparison can belong to.
+        """
         self.models = list(models)
         self.groups = list(groups)
         self.n_models = len(models)
@@ -47,6 +51,11 @@ class GroupTest:
         self._comparisons: list[tuple[str, str, bool]] = []
         self._group_labels: list[str] = []
         self._group_comparisons: dict[str, list[tuple[str, str, bool]]] = {}
+
+    @property
+    def group_labels(self) -> list[str]:
+        """Group label of each fitted comparison, in the order supplied."""
+        return list(self._group_labels)
 
     def fit(
         self,
@@ -58,7 +67,8 @@ class GroupTest:
 
         Args:
             comparisons: List of (model_a, model_b, a_wins) tuples.
-            group_labels: Category label for each comparison, same length as comparisons.
+            group_labels: Category label for each comparison, same length as
+                comparisons.
             reg: Regularisation for BT fitting.
 
         Returns:
@@ -77,7 +87,9 @@ class GroupTest:
         self.bt_per_group = {}
         self._group_comparisons = {}
         for g in self.groups:
-            g_comps = [c for c, gl in zip(comparisons, group_labels, strict=True) if gl == g]
+            g_comps = [
+                c for c, gl in zip(comparisons, group_labels, strict=True) if gl == g
+            ]
             if len(g_comps) < self.n_models:
                 continue
             self._group_comparisons[g] = g_comps
@@ -89,7 +101,9 @@ class GroupTest:
         self._group_labels = group_labels
         return self
 
-    def _loglik(self, bt: BradleyTerry, comparisons: list[tuple[str, str, bool]]) -> float:
+    def _loglik(
+        self, bt: BradleyTerry, comparisons: list[tuple[str, str, bool]]
+    ) -> float:
         """Compute log-likelihood of data under a fitted BT model."""
         ll = 0.0
         for a, b, w in comparisons:
@@ -157,15 +171,17 @@ class GroupCalibrator:
 
     This is the key advantage: calibration that transfers under
     distribution shift.
-
-    Args:
-        group_test: A fitted GroupTest object.
-
-    Raises:
-        RuntimeError: If the GroupTest has not been fitted.
     """
 
     def __init__(self, group_test: GroupTest) -> None:
+        """Wrap a fitted GroupTest.
+
+        Args:
+            group_test: A fitted GroupTest object.
+
+        Raises:
+            RuntimeError: If the GroupTest has not been fitted.
+        """
         if group_test.bt_null is None:
             msg = "GroupTest must be fitted"
             raise RuntimeError(msg)
@@ -214,14 +230,16 @@ class GroupCalibrator:
         for i in range(n):
             for j in range(n):
                 if i != j:
-                    W[i, j] = self.win_probability(models[i], models[j], target_distribution)
+                    W[i, j] = self.win_probability(
+                        models[i], models[j], target_distribution
+                    )
                 else:
                     W[i, j] = 0.5
         return W
 
     def _empirical_distribution(self) -> dict[str, float]:
         """Group weights proportional to number of comparisons."""
-        counts = Counter(self.gt._group_labels)
+        counts = Counter(self.gt.group_labels)
         return dict(counts)
 
     def sensitivity_analysis(

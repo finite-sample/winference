@@ -1,6 +1,6 @@
 ## winference: Win rate calibration under non-transitivity
 
-[![Python application](https://github.com/finite-sample/winference/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/winference/actions/workflows/ci.yml)
+[![CI](https://github.com/finite-sample/winference/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/winference/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/winference.svg)](https://pypi.org/project/winference/)
 [![Downloads](https://pepy.tech/badge/winference)](https://pepy.tech/project/winference)
 [![Documentation](https://github.com/finite-sample/winference/actions/workflows/docs.yml/badge.svg)](https://finite-sample.github.io/winference/)
@@ -65,16 +65,20 @@ pip install -e .
 
 ```python
 from winference import (
-    TournamentGraph, BradleyTerry, HodgeDecomposition,
-    GroupTest, GroupCalibrator, expected_calibration_error,
+    TournamentGraph,
+    BradleyTerry,
+    HodgeDecomposition,
+    GroupTest,
+    GroupCalibrator,
+    expected_calibration_error,
 )
 from winference.simulate import simulate_llm_arena
 
 # 1. Simulate (or load) arena data
 data = simulate_llm_arena()
-comparisons = data["comparisons"]   # list of (model_a, model_b, a_wins)
-categories  = data["categories"]    # list of category labels per comparison
-models      = data["models"]
+comparisons = data["comparisons"]  # list of (model_a, model_b, a_wins)
+categories = data["categories"]  # list of category labels per comparison
+models = data["models"]
 
 # 2. Graph triage: is non-transitivity a problem?
 tg = TournamentGraph(models)
@@ -103,11 +107,13 @@ print(gt.test_result())
 # Composable win rates
 gc = GroupCalibrator(gt)
 p_math_heavy = gc.win_probability(
-    "ZetaMath", "DeltaWrite",
+    "ZetaMath",
+    "DeltaWrite",
     target_distribution={"reasoning": 0.7, "creative_writing": 0.15, "coding": 0.15},
 )
 p_creative_heavy = gc.win_probability(
-    "ZetaMath", "DeltaWrite",
+    "ZetaMath",
+    "DeltaWrite",
     target_distribution={"reasoning": 0.15, "creative_writing": 0.7, "coding": 0.15},
 )
 ```

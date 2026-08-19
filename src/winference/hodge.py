@@ -1,5 +1,4 @@
-"""
-Hodge decomposition of pairwise comparison data.
+"""Hodge decomposition of pairwise comparison data.
 
 Any skew-symmetric matrix of log-odds (or edge flows on the tournament
 graph) can be orthogonally decomposed into:
@@ -50,18 +49,24 @@ class HodgeResult(NamedTuple):
 class HodgeDecomposition:
     """Hodge decomposition of a pairwise comparison matrix.
 
-    Args:
-        models: Model identifiers.
-
     Examples:
-        >>> hd = HodgeDecomposition(["A", "B", "C", "D"])
-        >>> result = hd.fit(win_rate_matrix)
-        >>> print(f"Cyclic fraction: {result.cyclic_variance:.1%}")
-        >>> # Calibrate using only the transitive part
-        >>> p_trans = hd.transitive_win_probability("A", "B")
+        >>> import numpy as np
+        >>> from winference import HodgeDecomposition
+        >>> rps = np.array([[0.5, 0.9, 0.1], [0.1, 0.5, 0.9], [0.9, 0.1, 0.5]])
+        >>> hd = HodgeDecomposition(["A", "B", "C"])
+        >>> result = hd.fit(rps)
+        >>> result.cyclic_variance  # rock-paper-scissors is pure curl
+        1.0
+        >>> hd.transitive_win_probability("A", "B")  # no transitive signal left
+        0.5
     """
 
     def __init__(self, models: list[str]) -> None:
+        """Create an unfitted decomposition over ``models``.
+
+        Args:
+            models: Model names, in the order used for indexing.
+        """
         self.models = list(models)
         self._idx: dict[str, int] = {m: i for i, m in enumerate(self.models)}
         self.n = len(models)
@@ -169,7 +174,7 @@ class HodgeDecomposition:
         return {m: float(self.result.potential[i]) for i, m in enumerate(self.models)}
 
     def curl_magnitude_per_pair(self) -> NDArray[np.float64]:
-        """NxN matrix of curl magnitude: how much each pair deviates from transitivity."""
+        """NxN matrix of curl magnitude: each pair's deviation from transitivity."""
         if self.result is None:
             msg = "Call .fit() first"
             raise RuntimeError(msg)
@@ -181,11 +186,12 @@ class HodgeDecomposition:
             msg = "Call .fit() first"
             raise RuntimeError(msg)
         C = np.abs(self.result.curl_flow)
-        pairs: list[tuple[str, str, float]] = []
         n = self.n
-        for i in range(n):
-            for j in range(i + 1, n):
-                pairs.append((self.models[i], self.models[j], float(C[i, j])))
+        pairs: list[tuple[str, str, float]] = [
+            (self.models[i], self.models[j], float(C[i, j]))
+            for i in range(n)
+            for j in range(i + 1, n)
+        ]
         pairs.sort(key=lambda x: x[2], reverse=True)
         return pairs[:k]
 

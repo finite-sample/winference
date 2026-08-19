@@ -45,7 +45,7 @@ class TestGroupTestFit:
 
     def test_raises_on_length_mismatch(self) -> None:
         gt = GroupTest(models=["A", "B"], groups=["x"])
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="same length"):
             gt.fit([("A", "B", True)], ["x", "y"])
 
 

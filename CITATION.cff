@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "winference"
+authors:
+  - family-names: "sood"
+    given-names: "gaurav"
+repository-code: "https://github.com/finite-sample/winference"
+license: MIT

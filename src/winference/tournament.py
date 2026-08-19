@@ -1,5 +1,4 @@
-"""
-Tournament graph diagnostics.
+"""Tournament graph diagnostics.
 
 Build the directed tournament graph from pairwise outcomes and analyse its
 strongly connected component (SCC) structure. Non-trivial SCCs (size > 1)
@@ -15,10 +14,8 @@ from numpy.typing import NDArray
 class TournamentGraph:
     """Directed tournament graph built from pairwise comparison data.
 
-    Args:
-        models: Unique model identifiers.
-
     Examples:
+        >>> from winference import TournamentGraph
         >>> tg = TournamentGraph(["A", "B", "C"])
         >>> tg.add_result("A", "B", win=True)
         >>> tg.add_result("B", "C", win=True)
@@ -28,6 +25,11 @@ class TournamentGraph:
     """
 
     def __init__(self, models: list[str]) -> None:
+        """Create an empty tournament over ``models``.
+
+        Args:
+            models: Model names, in the order used for indexing.
+        """
         self.models = list(models)
         self._idx: dict[str, int] = {m: i for i, m in enumerate(self.models)}
         n = len(models)
@@ -51,7 +53,14 @@ class TournamentGraph:
         col_b: str = "model_b",
         col_win: str = "a_wins",
     ) -> None:
-        """Bulk-load from a DataFrame with columns for model_a, model_b, a_wins (bool)."""
+        """Bulk-load from a DataFrame with model_a, model_b, a_wins (bool) columns.
+
+        Args:
+            df: Frame of comparison outcomes, one row per comparison.
+            col_a: Column holding the first model name.
+            col_b: Column holding the second model name.
+            col_win: Boolean column that is True when ``col_a`` won.
+        """
         for _, row in df.iterrows():
             self.add_result(str(row[col_a]), str(row[col_b]), bool(row[col_win]))
 

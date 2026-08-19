@@ -1,5 +1,4 @@
-"""
-Bradley-Terry model fitting via maximum likelihood.
+"""Bradley-Terry model fitting via maximum likelihood.
 
 The BT model assumes P(i beats j) = sigma(theta_i - theta_j) where sigma
 is the logistic function. Fitting recovers the strength vector theta.
@@ -16,17 +15,20 @@ from scipy.special import expit
 class BradleyTerry:
     """Maximum-likelihood Bradley-Terry model.
 
-    Args:
-        models: Unique model identifiers.
-
     Examples:
-        >>> bt = BradleyTerry(["A", "B", "C"])
-        >>> bt.fit(comparisons)  # list of (i, j, outcome) tuples
-        >>> bt.win_probability("A", "B")
-        0.73
+        >>> from winference import BradleyTerry
+        >>> comparisons = [("A", "B", True)] * 7 + [("A", "B", False)] * 3
+        >>> bt = BradleyTerry(["A", "B"]).fit(comparisons)
+        >>> round(bt.win_probability("A", "B"), 2)
+        0.7
     """
 
     def __init__(self, models: list[str]) -> None:
+        """Create an unfitted model over ``models``.
+
+        Args:
+            models: Model names, in the order used for indexing.
+        """
         self.models = list(models)
         self._idx: dict[str, int] = {m: i for i, m in enumerate(self.models)}
         self.n = len(models)
@@ -48,7 +50,9 @@ class BradleyTerry:
         Returns:
             Self for method chaining.
         """
-        data = np.array([(self._idx[a], self._idx[b], float(w)) for a, b, w in comparisons])
+        data = np.array(
+            [(self._idx[a], self._idx[b], float(w)) for a, b, w in comparisons]
+        )
         idx_a = data[:, 0].astype(int)
         idx_b = data[:, 1].astype(int)
         outcomes = data[:, 2]
@@ -79,7 +83,9 @@ class BradleyTerry:
         if not self._fitted or self.theta is None:
             msg = "Call .fit() first"
             raise RuntimeError(msg)
-        return float(expit(self.theta[self._idx[model_a]] - self.theta[self._idx[model_b]]))
+        return float(
+            expit(self.theta[self._idx[model_a]] - self.theta[self._idx[model_b]])
+        )
 
     def win_probability_matrix(self) -> NDArray[np.float64]:
         """NxN matrix of predicted win probabilities."""
@@ -97,8 +103,7 @@ class BradleyTerry:
         if not self._fitted:
             msg = "Call .fit() first"
             raise RuntimeError(msg)
-        preds = np.array([self.win_probability(a, b) for a, b, _ in comparisons])
-        return preds
+        return np.array([self.win_probability(a, b) for a, b, _ in comparisons])
 
     def strengths(self) -> dict[str, float]:
         """Return {model: theta} dictionary."""
@@ -113,6 +118,7 @@ class BradleyTerry:
         return sorted(s, key=lambda m: s[m], reverse=True)
 
     def __repr__(self) -> str:
+        """Return a short description including whether the model is fitted."""
         status = "fitted" if self._fitted else "unfitted"
         return f"BradleyTerry(n_models={self.n}, {status})"
 

@@ -1,0 +1,13 @@
+# Managed by copier — records template version for `copier update`. Do not edit.
+_commit: v1.1.1
+_src_path: gh:gojiplus/py-canon
+author_email: gsood07@gmail.com
+author_name: gaurav sood
+coverage_floor: 0
+default_branch: main
+description: Win rate calibration under non-transitivity via Hodge decomposition and
+    heterogeneous group testing
+needs_cli: false
+org: finite-sample
+package_name: winference
+project_name: winference

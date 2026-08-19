@@ -1,6 +1,4 @@
-"""
-winference quickstart
-=====================
+"""Quickstart demo for winference.
 
 Full pipeline: Graph triage -> Hodge decomposition -> Group testing ->
 Calibration comparison.
@@ -12,11 +10,11 @@ Key demonstrations:
 Run:  python examples/quickstart.py
 """
 
-import matplotlib
+import matplotlib as mpl
 import numpy as np
 from scipy.special import expit
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
@@ -35,6 +33,7 @@ from winference.simulate import simulate_llm_arena
 
 
 def main():
+    """Run the full quickstart pipeline and write the reliability diagram."""
     print("=" * 65)
     print("  winference quickstart: LLM arena with non-transitive win rates")
     print("=" * 65)
@@ -59,7 +58,10 @@ def main():
     summary = tg.summary()
     print(f"  SCC sizes:              {tg.scc_sizes()}")
     print(f"  Non-transitivity index: {summary['nontransitivity_index']:.2f}")
-    print(f"  Cyclic triples:         {summary['cyclic_triples']}/{summary['total_triples']}")
+    print(
+        f"  Cyclic triples:         {summary['cyclic_triples']}"
+        f"/{summary['total_triples']}"
+    )
 
     if summary["nontransitivity_index"] == 0:
         print("  -> No non-transitivity in majority-vote graph.")
@@ -97,7 +99,7 @@ def main():
     for (a, b), d in sorted(pair_data.items()):
         obs = d["wins"] / d["total"]
         pred = bt_global.win_probability(a, b)
-        i_a, i_b = hd._idx[a], hd._idx[b]
+        i_a, i_b = hd.models.index(a), hd.models.index(b)
         curl_mag = abs(hodge.curl_flow[i_a, i_b])
         curl_errors.append((a, b, obs, pred, abs(obs - pred), curl_mag))
 
@@ -107,10 +109,14 @@ def main():
     print("  " + "-" * 56)
     print("  High-curl pairs:")
     for a, b, obs, pred, err, curl in curl_errors[:5]:
-        print(f"    {a + ' vs ' + b:<28s} {obs:6.3f} {pred:6.3f} {err:6.3f} {curl:6.3f}")
+        print(
+            f"    {a + ' vs ' + b:<28s} {obs:6.3f} {pred:6.3f} {err:6.3f} {curl:6.3f}"
+        )
     print("  Low-curl pairs:")
     for a, b, obs, pred, err, curl in curl_errors[-3:]:
-        print(f"    {a + ' vs ' + b:<28s} {obs:6.3f} {pred:6.3f} {err:6.3f} {curl:6.3f}")
+        print(
+            f"    {a + ' vs ' + b:<28s} {obs:6.3f} {pred:6.3f} {err:6.3f} {curl:6.3f}"
+        )
 
     curls = np.array([x[5] for x in curl_errors])
     errors = np.array([x[4] for x in curl_errors])
@@ -155,15 +161,34 @@ def main():
     gc = GroupCalibrator(gt_train)
 
     shift_scenarios = {
-        "Same (35/35/30)": {"reasoning": 0.35, "creative_writing": 0.35, "coding": 0.30},
-        "Reasoning (70/15/15)": {"reasoning": 0.70, "creative_writing": 0.15, "coding": 0.15},
-        "Creative (15/70/15)": {"reasoning": 0.15, "creative_writing": 0.70, "coding": 0.15},
-        "Coding (15/15/70)": {"reasoning": 0.15, "creative_writing": 0.15, "coding": 0.70},
+        "Same (35/35/30)": {
+            "reasoning": 0.35,
+            "creative_writing": 0.35,
+            "coding": 0.30,
+        },
+        "Reasoning (70/15/15)": {
+            "reasoning": 0.70,
+            "creative_writing": 0.15,
+            "coding": 0.15,
+        },
+        "Creative (15/70/15)": {
+            "reasoning": 0.15,
+            "creative_writing": 0.70,
+            "coding": 0.15,
+        },
+        "Coding (15/15/70)": {
+            "reasoning": 0.15,
+            "creative_writing": 0.15,
+            "coding": 0.70,
+        },
     }
 
     true_theta = data["true_strengths"]
 
-    print(f"  {'Scenario':<25s} {'BT ECE':>8s} {'Grp ECE':>8s}  {'BT Brier':>9s} {'Grp Brier':>9s}")
+    print(
+        f"  {'Scenario':<25s} {'BT ECE':>8s} {'Grp ECE':>8s}"
+        f"  {'BT Brier':>9s} {'Grp Brier':>9s}"
+    )
     print("  " + "-" * 63)
 
     fig, axes = plt.subplots(2, 2, figsize=(10, 9))
@@ -182,7 +207,9 @@ def main():
             test_comps_shifted.append((mi, mj, bool(win)))
 
         test_out = np.array([float(w) for _, _, w in test_comps_shifted])
-        pred_bt = np.array([bt_train.win_probability(a, b) for a, b, _ in test_comps_shifted])
+        pred_bt = np.array(
+            [bt_train.win_probability(a, b) for a, b, _ in test_comps_shifted]
+        )
         pred_grp = np.array(
             [gc.win_probability(a, b, target_dist) for a, b, _ in test_comps_shifted]
         )
@@ -194,18 +221,22 @@ def main():
 
         marker = " <-" if abs(ece_bt - ece_grp) > 0.005 and ece_grp < ece_bt else ""
         print(
-            f"  {sname:<25s} {ece_bt:8.4f} {ece_grp:8.4f}  {brier_bt:9.4f} {brier_grp:9.4f}{marker}"
+            f"  {sname:<25s} {ece_bt:8.4f} {ece_grp:8.4f}"
+            f"  {brier_bt:9.4f} {brier_grp:9.4f}{marker}"
         )
 
         ax = axes_flat[si]
-        reliability_diagram(pred_bt, test_out, n_bins=10, ax=ax, label="Global BT", color="#d95f02")
+        reliability_diagram(
+            pred_bt, test_out, n_bins=10, ax=ax, label="Global BT", color="#d95f02"
+        )
         reliability_diagram(
             pred_grp, test_out, n_bins=10, ax=ax, label="Per-group BT", color="#1b9e77"
         )
         ax.set_title(sname, fontsize=10)
 
     fig.suptitle(
-        "Calibration Under Distribution Shift\n(trained on balanced 35/35/30, tested on shifted)",
+        "Calibration Under Distribution Shift\n"
+        "(trained on balanced 35/35/30, tested on shifted)",
         fontsize=12,
     )
     fig.tight_layout()

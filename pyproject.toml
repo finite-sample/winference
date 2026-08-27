@@ -87,7 +87,11 @@ known-first-party = ["winference"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --tb=short"
+addopts = ["-v", "--tb=short", "--strict-config", "--strict-markers", "-ra"]
+minversion = "6"
+log_level = "INFO"
+xfail_strict = true
+filterwarnings = ["error"]
 
 [tool.coverage.run]
 source = ["src"]

@@ -159,13 +159,13 @@ simpler causes:
 | Source | What it is | How to address |
 |---|---|---|
 | **Judge noise** | LLM judge gives inconsistent verdicts on the same pair | Bayesian calibration (Dawid-Skene, BWRS) |
-| **Position bias** | Judge prefers whichever response appears first/second | Randomise presentation order, average both orderings |
+| **Position bias** | Judge prefers whichever response appears first/second | Randomize presentation order, average both orderings |
 | **Style/length bias** | Judge rewards verbosity rather than quality | Regress out length/style features (cf. AlpacaEval 2.0) |
 | **Evaluator disagreement** | Individual annotators are transitive, but they disagree with each other (Condorcet cycles) | Stratify by evaluator type, or accept the Hodge curl as measuring genuine disagreement |
 | **Fine-grained interaction** | Strengths differ at sub-category level (algebra vs geometry within "math") | Per-prompt routing rather than aggregate ranking |
 | **Context effects** | Evaluation of A vs B depends on what other models were seen | Session-aware experimental design |
 
-`winference` targets the modelling layer (rows 4–5 in the table above). It
+`winference` targets the modeling layer (rows 4–5 in the table above). It
 assumes you've already addressed measurement issues at the design/preprocessing
 level.
 
@@ -222,7 +222,7 @@ Composable win rates from per-group BT.
 ## References
 
 - Jiang, X., Lim, L.-H., Yao, Y., & Ye, Y. (2011). Statistical ranking and combinatorial Hodge theory. *Mathematical Programming*, 127(1), 203–244.
-- Dittrich, R., Hatzinger, R., & Katzenbeisser, W. (1998). Modelling the effect of subject-specific covariates in paired comparison studies. *Applied Statistics*, 47(4), 511–525.
+- Dittrich, R., Hatzinger, R., & Katzenbeisser, W. (1998). Modelling the effect of subject-specific covariates in paired comparison studies. *Applied Statistics*, 47(4), 511–525. <!-- codespell:ignore modelling -->
 - Xu, Y., Ruis, L., Rocktäschel, T., & Kirk, R. (2025). Investigating non-transitivity in LLM-as-a-Judge. *ICML 2025*.
 - Li, X. & Li, S. (2025). Efficient inference for covariate-adjusted Bradley-Terry model with covariate shift. *arXiv:2503.18256*.
 - Balduzzi, D., Tuyls, K., Perolat, J., & Graepel, T. (2018). Re-evaluating evaluation. *NeurIPS*.

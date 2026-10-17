@@ -45,7 +45,7 @@ class BradleyTerry:
 
         Args:
             comparisons: Each element is (model_a, model_b, a_wins).
-            reg: L2 regularisation strength (prevents divergence for unbeaten models).
+            reg: L2 regularization strength (prevents divergence for unbeaten models).
 
         Returns:
             Self for method chaining.

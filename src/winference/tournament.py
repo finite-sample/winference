@@ -1,6 +1,6 @@
 """Tournament graph diagnostics.
 
-Build the directed tournament graph from pairwise outcomes and analyse its
+Build the directed tournament graph from pairwise outcomes and analyze its
 strongly connected component (SCC) structure. Non-trivial SCCs (size > 1)
 indicate clusters of models that cannot be linearly ordered — i.e. pockets
 of non-transitivity.

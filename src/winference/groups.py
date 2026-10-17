@@ -69,7 +69,7 @@ class GroupTest:
             comparisons: List of (model_a, model_b, a_wins) tuples.
             group_labels: Category label for each comparison, same length as
                 comparisons.
-            reg: Regularisation for BT fitting.
+            reg: Regularization for BT fitting.
 
         Returns:
             Self for method chaining.
@@ -199,7 +199,7 @@ class GroupCalibrator:
             model_a: First model name.
             model_b: Second model name.
             target_distribution: Dict mapping group to weight. Weights are
-                normalised internally. If None, uses the empirical distribution
+                normalized internally. If None, uses the empirical distribution
                 from the training data.
 
         Returns:

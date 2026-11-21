@@ -30,10 +30,13 @@ Decomposes the pairwise comparison matrix into:
 - **Gradient** (transitive): a potential `s_i` per model such that the
   log-odds ≈ `s_i − s_j`.  This part *can* be calibrated to a scalar ranking.
 - **Curl** (cyclic): rock-paper-scissors structure that *cannot* be represented
-  by any linear ranking.
+  by any linear ranking. It comes from triangles of observed comparisons.
+- **Harmonic** (global): residual flow around gaps in the comparison graph.
+  A four-player cycle with neither diagonal observed is entirely harmonic
+  when its four directed log odds and counts are equal.
 
-Calibrate win rates from the gradient component.  Report the curl fraction as
-the share of variance your calibration ignores.
+Calibrate win rates from the gradient component. Add the cyclic and harmonic
+fractions for the share of comparison-weighted variation outside the ranking.
 
 **Use when:** Cycles persist even after conditioning on task category — the
 non-transitivity is irreducible.
@@ -92,7 +95,8 @@ print(tg.summary())
 hd = HodgeDecomposition(models)
 result = hd.fit(tg.win_rate_matrix(), weights=tg.counts)
 print(f"Transitive: {result.transitive_variance:.0%}")
-print(f"Cyclic:     {result.cyclic_variance:.0%}")
+print(f"Local cycles:  {result.cyclic_variance:.0%}")
+print(f"Global cycles: {result.harmonic_variance:.0%}")
 
 # Calibrated win probability (transitive component only)
 p = hd.transitive_win_probability("ZetaMath", "DeltaWrite")

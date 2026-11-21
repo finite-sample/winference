@@ -20,6 +20,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Weight the Hodge variance fractions by the comparison counts used to fit
   the ranking. Pairs with zero count contribute zero to the reported fractions.
+- Separate local triangle flow from global harmonic flow when some
+  pairs have no comparisons. The sum of both variance fractions measures
+  variation outside the fitted ranking.
 
 ## 0.1.0 - 2026-03-08
 

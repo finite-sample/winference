@@ -111,6 +111,66 @@ class TestVarianceFractions:
         assert result.transitive_variance > 0.9
 
 
+class TestSparseCycles:
+    def test_square_has_only_harmonic_flow(self) -> None:
+        flow = np.zeros((4, 4))
+        for i, j in [(0, 1), (1, 2), (2, 3), (3, 0)]:
+            flow[i, j], flow[j, i] = 1, -1
+        result = HodgeDecomposition(list("ABCD")).fit(expit(flow), np.abs(flow))
+        np.testing.assert_allclose(result.harmonic_flow, flow, atol=1e-12)
+        np.testing.assert_allclose(result.curl_flow, 0, atol=1e-12)
+        assert result.harmonic_variance == pytest.approx(1)
+
+    @pytest.mark.parametrize(
+        "counts", [np.ones((1, 2)), np.full((2, 2), -1), np.full((2, 2), np.nan)]
+    )
+    def test_invalid_counts(self, counts: np.ndarray) -> None:
+        with pytest.raises(ValueError, match="count matrix"):
+            HodgeDecomposition(list("AB")).fit(np.full((2, 2), 0.5), counts)
+
+    def test_invalid_rate_shape(self) -> None:
+        with pytest.raises(ValueError, match="win-rate matrix"):
+            HodgeDecomposition(list("AB")).fit(np.full((1, 2), 0.5))
+
+    def test_weighted_triangle_and_square(self) -> None:
+        # The two cycles meet only at A. Each has balanced weighted flow at
+        # every vertex, and only the triangle bounds a face.
+        local = np.zeros((6, 6))
+        global_cycle = np.zeros_like(local)
+        counts = np.zeros_like(local)
+        for flow, edges in [
+            (local, [(0, 1, 4), (1, 2, 3), (2, 0, 2)]),
+            (global_cycle, [(0, 3, 2), (3, 4, 5), (4, 5, 6), (5, 0, 3)]),
+        ]:
+            for i, j, w in edges:
+                counts[i, j] = counts[j, i] = w
+                flow[i, j], flow[j, i] = 1 / w, -1 / w
+        potentials = [0, 0.05, 0.1, -0.3, 0.2, 0.4]
+        rank = np.subtract.outer(potentials, potentials)
+        observed = counts > 0
+        rates = np.where(observed, expit(rank + local + global_cycle), np.nan)
+        np.fill_diagonal(rates, 0.5)
+        result = HodgeDecomposition(list("ABCDEF")).fit(rates, counts)
+        for actual, expected in [
+            (result.gradient_flow, rank),
+            (result.curl_flow, local),
+            (result.harmonic_flow, global_cycle),
+        ]:
+            np.testing.assert_allclose(actual, expected, atol=1e-12)
+        energies = np.array(
+            [np.sum(counts * f**2) for f in (rank, local, global_cycle)]
+        )
+        np.testing.assert_allclose(
+            [
+                result.transitive_variance,
+                result.cyclic_variance,
+                result.harmonic_variance,
+            ],
+            energies / energies.sum(),
+            atol=1e-12,
+        )
+
+
 class TestTransitiveWinProbability:
     def test_raises_before_fit(self) -> None:
         hd = HodgeDecomposition(["A", "B"])

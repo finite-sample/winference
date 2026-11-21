@@ -7,7 +7,7 @@ module-name = "winference"
 
 [project]
 name = "winference"
-version = "0.1.0"
+version = "0.2.0"
 description = "Win rate calibration under non-transitivity via Hodge decomposition and heterogeneous group testing"
 readme = "README.md"
 license = "MIT"

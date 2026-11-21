@@ -83,7 +83,7 @@ Quickstart
        tg.add_result(a, b, w)
 
    print(tg.summary())
-   # → {'nontransitivity_index': 0.83, 'cyclic_triples': 7, ...}
+   # The default simulation has nontransitivity_index 0.5 and one cyclic triple.
 
    # 3a. Hodge decomposition
    hd = HodgeDecomposition(models)
@@ -97,7 +97,7 @@ Quickstart
    gt = GroupTest(models, groups)
    gt.fit(comparisons, categories)
    print(gt.test_result())
-   # → {'statistic': 342.1, 'p_value': 1.2e-63, 'reject_at_05': True}
+   # For the default simulation: statistic ≈ 3585.44, df = 10, reject_at_05 = True.
 
    # Composable win rates
    gc = GroupCalibrator(gt)

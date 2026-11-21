@@ -76,7 +76,7 @@ def _split_residual(
     # 1/sqrt(weight) to each of its three edges. Its column space is the
     # local component of the weighted Hodge decomposition (Jiang et al. §5.1).
     root_weight = np.sqrt(weights[left, right])
-    rows = np.asarray(triangle_edges).ravel()
+    rows = np.asarray(triangle_edges, dtype=np.intp).ravel()
     cols = np.repeat(np.arange(len(triangle_edges)), 3)
     signs = np.tile([1.0, 1.0, -1.0], len(triangle_edges))
     boundaries = coo_array(

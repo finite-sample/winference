@@ -83,7 +83,9 @@ class HodgeDecomposition:
             W: Win rate matrix of shape (n, n) where W[i,j] = P(i beats j).
                 Should satisfy W[i,j] + W[j,i] ~ 1.
             weights: Number of comparisons per pair of shape (n, n), used for
-                weighted least squares. Default: uniform weights.
+                weighted least squares and the reported variance fractions.
+                A pair with zero comparisons contributes no weight. By default
+                every pair has equal weight.
 
         Returns:
             HodgeResult containing decomposition components.
@@ -120,8 +122,12 @@ class HodgeDecomposition:
         curl_flow = Y - grad_flow
         harmonic_flow = np.zeros_like(Y)
 
+        # The projection is orthogonal in the same weighted inner product
+        # used in the least-squares fit (Jiang et al., 2011, section 5.1).
+        edge_weights = np.triu(weights, k=1)
+
         def sq_norm(M: NDArray[np.float64]) -> float:
-            return float(np.sum(np.triu(M, k=1) ** 2))
+            return float(np.sum(edge_weights * M**2))
 
         total_var = sq_norm(Y)
         grad_var = sq_norm(grad_flow)

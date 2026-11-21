@@ -23,14 +23,16 @@ Calibration strategy
 1. Compute the Hodge decomposition of the empirical log-odds.
 2. Use the gradient component s as BT strengths giving *transitive*
    calibrated win probabilities: P_trans(i > j) = sigmoid(s_i - s_j).
-3. Report ||curl||^2 / ||Y||^2 as the fraction of variance due to
-   non-transitive structure, the part your calibration *ignores*.
+3. Add the cyclic and harmonic variance fractions to measure the share
+   of comparison-weighted variation outside a single ranking.
 """
 
 from typing import NamedTuple
 
 import numpy as np
 from numpy.typing import NDArray
+from scipy.sparse import coo_array
+from scipy.sparse.linalg import lsmr
 from scipy.special import expit, logit
 
 
@@ -44,6 +46,58 @@ class HodgeResult(NamedTuple):
     transitive_variance: float
     cyclic_variance: float
     harmonic_variance: float
+
+
+def _split_residual(
+    residual: NDArray[np.float64], weights: NDArray[np.float64]
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Project the observed residual onto the boundaries of observed triangles."""
+    observed = weights > 0
+    np.fill_diagonal(observed, False)
+    residual = np.where(observed, residual, 0.0)
+    # A vertex joined to every other vertex fills every cycle with triangles,
+    # including on complete tournaments. No harmonic component can remain.
+    if np.any(observed.sum(axis=1) == len(weights) - 1):
+        return residual, np.zeros_like(residual)
+
+    left, right = np.nonzero(np.triu(observed, k=1))
+    edge_index = np.zeros_like(weights, dtype=np.intp)
+    edge_index[left, right] = np.arange(len(left))
+    triangle_edges = []
+    for i, j in zip(left, right, strict=True):
+        later = np.flatnonzero(observed[i, j + 1 :] & observed[j, j + 1 :]) + j + 1
+        triangle_edges.extend(
+            (edge_index[i, j], edge_index[j, k], edge_index[i, k]) for k in later
+        )
+    if not triangle_edges:
+        return np.zeros_like(residual), residual
+
+    # In coordinates scaled by sqrt(weight), a triangle contributes signed
+    # 1/sqrt(weight) to each of its three edges. Its column space is the
+    # local component of the weighted Hodge decomposition (Jiang et al. §5.1).
+    root_weight = np.sqrt(weights[left, right])
+    rows = np.asarray(triangle_edges).ravel()
+    cols = np.repeat(np.arange(len(triangle_edges)), 3)
+    signs = np.tile([1.0, 1.0, -1.0], len(triangle_edges))
+    boundaries = coo_array(
+        (signs / root_weight[rows], (rows, cols)),
+        shape=(len(left), len(triangle_edges)),
+    ).tocsr()
+    target = root_weight * residual[left, right]
+    coefficients, stop, *_ = lsmr(
+        boundaries,
+        target,
+        atol=1e-13,
+        btol=1e-13,
+        conlim=0,
+        maxiter=5 * min(len(left), len(triangle_edges)),
+    )
+    if stop in (3, 6, 7):
+        raise RuntimeError("The weighted triangle projection did not converge")
+    local = np.zeros_like(residual)
+    local[left, right] = (boundaries @ coefficients) / root_weight
+    local[right, left] = -local[left, right]
+    return local, residual - local
 
 
 class HodgeDecomposition:
@@ -81,25 +135,37 @@ class HodgeDecomposition:
 
         Args:
             W: Win rate matrix of shape (n, n) where W[i,j] = P(i beats j).
-                Should satisfy W[i,j] + W[j,i] ~ 1.
+                Observed pairs should satisfy W[i,j] + W[j,i] ~ 1. Values
+                at pairs with zero weight are ignored.
             weights: Number of comparisons per pair of shape (n, n), used for
                 weighted least squares and the reported variance fractions.
                 A pair with zero comparisons contributes no weight. By default
                 every pair has equal weight.
 
         Returns:
-            HodgeResult containing decomposition components.
+            HodgeResult containing decomposition components. The gradient gives
+            fitted differences for all model pairs. Local curl and harmonic
+            flow are zero on unobserved pairs.
+
+        Raises:
+            ValueError: For invalid matrix shapes or comparison counts.
         """
         n = self.n
 
-        W_clip = np.clip(W, 0.01, 0.99)
+        if weights is None:
+            weights = np.ones((n, n))
+        weights = np.asarray(weights, dtype=float)
+        if weights.shape != (n, n) or not np.all(np.isfinite(weights) & (weights >= 0)):
+            raise ValueError(
+                "weights must be a finite, nonnegative (n, n) count matrix"
+            )
+        weights = 0.5 * weights + 0.5 * weights.T
+        if np.shape(W) != (n, n):
+            raise ValueError("W must be an (n, n) win-rate matrix")
+        W_clip = np.clip(np.where(weights > 0, W, 0.5), 0.01, 0.99)
         Y = logit(W_clip)
         Y = 0.5 * (Y - Y.T)
         np.fill_diagonal(Y, 0.0)
-
-        if weights is None:
-            weights = np.ones((n, n))
-        weights = 0.5 * (weights + weights.T)
 
         L = np.zeros((n, n))
         div_Y = np.zeros(n)
@@ -119,8 +185,7 @@ class HodgeDecomposition:
         s -= s.mean()
 
         grad_flow = np.subtract.outer(s, s)
-        curl_flow = Y - grad_flow
-        harmonic_flow = np.zeros_like(Y)
+        curl_flow, harmonic_flow = _split_residual(Y - grad_flow, weights)
 
         # The projection is orthogonal in the same weighted inner product
         # used in the least-squares fit (Jiang et al., 2011, section 5.1).
@@ -180,14 +245,14 @@ class HodgeDecomposition:
         return {m: float(self.result.potential[i]) for i, m in enumerate(self.models)}
 
     def curl_magnitude_per_pair(self) -> NDArray[np.float64]:
-        """NxN matrix of curl magnitude: each pair's deviation from transitivity."""
+        """Absolute local triangle flow per pair."""
         if self.result is None:
             msg = "Call .fit() first"
             raise RuntimeError(msg)
         return np.abs(self.result.curl_flow)
 
     def worst_pairs(self, k: int = 10) -> list[tuple[str, str, float]]:
-        """Top-k pairs with largest cyclic residual."""
+        """Top-k pairs with the largest absolute local triangle flow."""
         if self.result is None:
             msg = "Call .fit() first"
             raise RuntimeError(msg)

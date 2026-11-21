@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from scipy.special import expit
 
 from winference import HodgeDecomposition, TournamentGraph
 
@@ -70,6 +71,31 @@ class TestVarianceFractions:
             + result.harmonic_variance
         )
         assert total == pytest.approx(1.0, abs=0.01)
+
+    @pytest.mark.parametrize(
+        ("counts", "cyclic_fraction"),
+        [
+            ([100, 1, 1], 50 / 1139),
+            ([1, 1, 1], 1.0),
+            ([0, 1, 1], 0.0),
+            ([0, 0, 0], 0.0),
+        ],
+    )
+    def test_weighted_triangle_fractions(
+        self, counts: list[int], cyclic_fraction: float
+    ) -> None:
+        # The signed log odds for A>B, B>C, and C>A are all one. Residuals
+        # must sum to three around the cycle. For positive counts their
+        # minimum weighted squared length is 9 / sum(1 / count).
+        rates = expit(np.array([[0, 1, -1], [-1, 0, 1], [1, -1, 0]]))
+        ab, bc, ca = counts
+        weights = np.array([[0, ab, ca], [ab, 0, bc], [ca, bc, 0]])
+        fit = HodgeDecomposition(["A", "B", "C"]).fit(rates, weights)
+
+        assert fit.cyclic_variance == pytest.approx(cyclic_fraction, abs=1e-12)
+        transitive = 1 - cyclic_fraction if any(counts) else 0.0
+        assert fit.transitive_variance == pytest.approx(transitive, abs=1e-12)
+        assert fit.harmonic_variance == 0.0
 
     def test_transitive_data_high_transitive_variance(self) -> None:
         hd = HodgeDecomposition(["A", "B", "C", "D"])

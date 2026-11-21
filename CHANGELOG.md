@@ -16,6 +16,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Adopted the py-canon fleet standard: shared reusable CI, docs and release
   workflows, ruff/pyright/pydoclint configuration, and a `src/` layout.
 
+### Fixed
+
+- Weight the Hodge variance fractions by the comparison counts used to fit
+  the ranking. Pairs with zero count contribute zero to the reported fractions.
+
 ## 0.1.0 - 2026-03-08
 
 ### Added

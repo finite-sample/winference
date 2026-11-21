@@ -193,7 +193,9 @@ Hodge decomposition of the pairwise log-odds matrix.
 - `.fit(W, weights)` — decompose win-rate matrix
 - `.transitive_win_probability(a, b)` — P(a>b) from gradient only
 - `.worst_pairs(k)` — pairs with largest cyclic residual
-- `.summary()` — variance fractions (transitive / cyclic / harmonic)
+- `.summary()` — fractions of squared pairwise log odds. The optional comparison
+  counts weight both the fit and these fractions. Unobserved pairs with zero
+  count contribute zero.
 
 ### `GroupTest`
 Likelihood-ratio test for heterogeneity across prompt groups.

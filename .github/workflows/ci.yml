@@ -21,6 +21,6 @@ jobs:
       wheel-import: winference
       # The reusable default matrix starts at 3.11, which cannot resolve against
       # this package's requires-python >= 3.12.
-      python-versions: '["3.12", "3.14"]'
+      python-versions: '["3.13", "3.14"]'
       coverage-floor: 90
       run-preen: true
